@@ -6,7 +6,7 @@
 # Andrea
 setwd("~/2019/UVG/Segundo Semestre/DataScience/Laboratorios/Laboratorio1/Laboratorio1DataScience")
 # Ivette
-
+setwd("C:/Users/DELL/Documents/UVG/VIII_Semestre/Data Science/Laboratorio1DataScience")
 # Librerias a utilizar
 #install.packages("cluster")
 library(cluster) #Para calcular la silueta
@@ -22,6 +22,9 @@ library(NbClust) #Para determinar el número de clusters óptimo
 library(factoextra) #Para hacer gráficos bonitos de clustering
 #install.packages("ape")
 library(ape)
+#Rules
+library(arules)
+library(arulesViz)
 
 # Se lee el archivo que contiene los datos
 data <- read.csv("train.csv")
@@ -190,5 +193,13 @@ nrow(kmg6)
 summary(kmg6)
 
 plotcluster(cuantiPrueba, km$cluster)
+
+#RULES
+lasreglas <- select(datos, OverallQual , OverallCond, SalePrice)
+reglas<-apriori(lasreglas, parameter = list(support = 0.2,
+                                            confidence = 0.70,
+                                            target = "rules"))
+reglas
+
 
 
