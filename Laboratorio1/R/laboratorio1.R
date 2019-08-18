@@ -25,6 +25,16 @@ library(ape)
 #Rules
 library(arules)
 library(arulesViz)
+library(corrplot)
+library(Hmisc)
+library(ggplot2)
+library(ggpubr)
+#PCA
+library(rela)
+library(psych)
+library(FactoMineR)
+#THEME
+theme_set(theme_pubr())
 
 # Se lee el archivo que contiene los datos
 data <- read.csv("train.csv")
@@ -56,6 +66,21 @@ cualitativas <- data[, c("MSZoning", "Street", "Alley", "LotShape", "LandContour
 # Analisis de correlacion
 corrcuant <- cor(cuantitativas, use="complete.obs", method="pearson")
 corrcuant
+corrplot(corrcuant, method = "square")
+
+res2<-rcorr(as.matrix(cuantitativas))
+
+flattenCorrMatrix <- function(cormat, pmat) {
+  ut <- upper.tri(cormat)
+  data.frame(
+    row = rownames(cormat)[row(cormat)[ut]],
+    column = rownames(cormat)[col(cormat)[ut]],
+    cor  =(cormat)[ut],
+    p = pmat[ut]
+  )
+}
+
+flattenCorrMatrix(res2$r, res2$P)
 
 
 # Analisis de variables cualitativas
@@ -66,7 +91,17 @@ corrcuant
 dir_freq = as.data.frame(table(cualitativas$LotConfig))
 colnames(dir_freq)<- c("LotConfig","Frecuencia")
 dir = dir_freq[order(dir_freq[,2], decreasing = TRUE), ]
-dir 
+dir
+
+df <- cualitativas %>%
+  group_by(LotConfig) %>%
+  summarise(counts = n())
+df
+
+ggplot(df, aes(x = LotConfig, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  geom_text(aes(label = counts), vjust = -0.3) + 
+  theme_pubclean()
 
 # Condition1
 dir_freq = as.data.frame(table(cualitativas$Condition1))
@@ -74,11 +109,32 @@ colnames(dir_freq)<- c("Condition1","Frecuencia")
 dir = dir_freq[order(dir_freq[,2], decreasing = TRUE), ]
 dir 
 
+df <- cualitativas %>%
+  group_by(Condition1) %>%
+  summarise(counts = n())
+df
+
+ggplot(df, aes(x = Condition1, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  geom_text(aes(label = counts), vjust = -0.3) + 
+  theme_pubclean()
+
 # BldgType
 dir_freq = as.data.frame(table(cualitativas$BldgType))
 colnames(dir_freq)<- c("BldgType","Frecuencia")
 dir = dir_freq[order(dir_freq[,2], decreasing = TRUE), ]
 dir 
+
+df <- cualitativas %>%
+  group_by(BldgType) %>%
+  summarise(counts = n())
+df
+
+ggplot(df, aes(x = BldgType, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  geom_text(aes(label = counts), vjust = -0.3) + 
+  theme_pubclean()
+
 
 # HouseStyle
 dir_freq = as.data.frame(table(cualitativas$HouseStyle))
@@ -86,11 +142,32 @@ colnames(dir_freq)<- c("HouseStyle","Frecuencia")
 dir = dir_freq[order(dir_freq[,2], decreasing = TRUE), ]
 dir 
 
+df <- cualitativas %>%
+  group_by(HouseStyle) %>%
+  summarise(counts = n())
+df
+
+ggplot(df, aes(x = HouseStyle, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  geom_text(aes(label = counts), vjust = -0.3) + 
+  theme_pubclean()
+
+
 # BsmtCond
 dir_freq = as.data.frame(table(cualitativas$BsmtCond))
 colnames(dir_freq)<- c("BsmtCond","Frecuencia")
 dir = dir_freq[order(dir_freq[,2], decreasing = TRUE), ]
 dir 
+
+df <- cualitativas %>%
+  group_by(BsmtCond) %>%
+  summarise(counts = n())
+df
+
+ggplot(df, aes(x = BsmtCond, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  geom_text(aes(label = counts), vjust = -0.3) + 
+  theme_pubclean()
 
 # Heating
 dir_freq = as.data.frame(table(cualitativas$Heating))
@@ -98,11 +175,31 @@ colnames(dir_freq)<- c("Heating","Frecuencia")
 dir = dir_freq[order(dir_freq[,2], decreasing = TRUE), ]
 dir 
 
+df <- cualitativas %>%
+  group_by(Heating) %>%
+  summarise(counts = n())
+df
+
+ggplot(df, aes(x = Heating, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  geom_text(aes(label = counts), vjust = -0.3) + 
+  theme_pubclean()
+
 # Electrical
 dir_freq = as.data.frame(table(cualitativas$Electrical))
 colnames(dir_freq)<- c("Electrical","Frecuencia")
 dir = dir_freq[order(dir_freq[,2], decreasing = TRUE), ]
 dir 
+
+df <- cualitativas %>%
+  group_by(Electrical) %>%
+  summarise(counts = n())
+df
+
+ggplot(df, aes(x = Electrical, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  geom_text(aes(label = counts), vjust = -0.3) + 
+  theme_pubclean()
 
 # KitchenQual
 dir_freq = as.data.frame(table(cualitativas$KitchenQual))
@@ -110,11 +207,33 @@ colnames(dir_freq)<- c("KitchenQual","Frecuencia")
 dir = dir_freq[order(dir_freq[,2], decreasing = TRUE), ]
 dir 
 
+df <- cualitativas %>%
+  group_by(KitchenQual) %>%
+  summarise(counts = n())
+df
+
+ggplot(df, aes(x = KitchenQual, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  geom_text(aes(label = counts), vjust = -0.3) + 
+  theme_pubclean()
+
+
 # FireplaceQu
 dir_freq = as.data.frame(table(cualitativas$FireplaceQu))
 colnames(dir_freq)<- c("FireplaceQu","Frecuencia")
 dir = dir_freq[order(dir_freq[,2], decreasing = TRUE), ]
 dir 
+
+df <- cualitativas %>%
+  group_by(FireplaceQu) %>%
+  summarise(counts = n())
+df
+
+ggplot(df, aes(x = FireplaceQu, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  geom_text(aes(label = counts), vjust = -0.3) + 
+  theme_pubclean()
+
 
 # GarageType
 dir_freq = as.data.frame(table(cualitativas$GarageType))
@@ -122,11 +241,33 @@ colnames(dir_freq)<- c("GarageType","Frecuencia")
 dir = dir_freq[order(dir_freq[,2], decreasing = TRUE), ]
 dir 
 
+df <- cualitativas %>%
+  group_by(GarageType) %>%
+  summarise(counts = n())
+df
+
+ggplot(df, aes(x = GarageType, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  geom_text(aes(label = counts), vjust = -0.3) + 
+  theme_pubclean()
+
+
 # PoolQC
 dir_freq = as.data.frame(table(cualitativas$PoolQC))
 colnames(dir_freq)<- c("PoolQC","Frecuencia")
 dir = dir_freq[order(dir_freq[,2], decreasing = TRUE), ]
 dir 
+
+df <- cualitativas %>%
+  group_by(PoolQC) %>%
+  summarise(counts = n())
+df
+
+ggplot(df, aes(x = PoolQC, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  geom_text(aes(label = counts), vjust = -0.3) + 
+  theme_pubclean()
+
 
 # SaleType
 dir_freq = as.data.frame(table(cualitativas$SaleType))
@@ -134,11 +275,33 @@ colnames(dir_freq)<- c("SaleType","Frecuencia")
 dir = dir_freq[order(dir_freq[,2], decreasing = TRUE), ]
 dir 
 
+df <- cualitativas %>%
+  group_by(SaleType) %>%
+  summarise(counts = n())
+df
+
+ggplot(df, aes(x = SaleType, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  geom_text(aes(label = counts), vjust = -0.3) + 
+  theme_pubclean()
+
+
 # SaleCondition
 dir_freq = as.data.frame(table(cualitativas$SaleCondition))
 colnames(dir_freq)<- c("SaleCondition","Frecuencia")
 dir = dir_freq[order(dir_freq[,2], decreasing = TRUE), ]
 dir 
+
+df <- cualitativas %>%
+  group_by(SaleCondition) %>%
+  summarise(counts = n())
+df
+
+ggplot(df, aes(x = SaleCondition, y = counts)) +
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  geom_text(aes(label = counts), vjust = -0.3) + 
+  theme_pubclean()
+
 
 
 # Clusters
@@ -193,6 +356,17 @@ nrow(kmg6)
 summary(kmg6)
 
 plotcluster(cuantiPrueba, km$cluster)
+
+#PCA
+pafDatos<-paf(as.matrix(cuantitativas[,2:8]))
+pafDatos$KMO #0.62 Es la adecuación a la muestra
+pafDatos$Bartlett #2212 Mientras mas alto sea mejor
+summary(pafDatos)
+
+#nivel de significancia 
+cortest.bartlett(cuantitativas[,-1])
+cor(cuantitativas[,-1],use = "pairwise.complete.obs")
+
 
 #RULES
 lasreglas <- select(datos, OverallQual , OverallCond, SalePrice)
