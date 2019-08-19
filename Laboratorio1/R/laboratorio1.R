@@ -30,6 +30,10 @@ library(Hmisc)
 library(ggplot2)
 library(ggpubr)
 #PCA
+install.packages("rela")
+install.packages("psych")
+install.packages("FactoMineR")
+install.packages("corrplot")
 library(rela)
 library(psych)
 library(FactoMineR)
@@ -303,6 +307,54 @@ ggplot(df, aes(x = SaleCondition, y = counts)) +
   theme_pubclean()
 
 
+# PCA
+# ---
+str(cuantiPrueba)
+cuantiPaf <- cuantiPrueba[, c("MSSubClass", "LotArea", "OverallCond", 
+                              "YearBuilt", "YearRemodAdd", "BsmtFinSF1", 
+                              "BsmtUnfSF", "TotalBsmtSF", "X1stFlrSF",
+                              "GrLivArea", "BsmtFullBath", "BsmtHalfBath", "FullBath", "HalfBath", 
+                              "BedroomAbvGr", "KitchenAbvGr", "TotRmsAbvGrd", "Fireplaces", 
+                              "GarageCars", "GarageArea", "WoodDeckSF", "OpenPorchSF", "EnclosedPorch", 
+                              "ScreenPorch", "PoolArea", "MiscVal", "YrSold", "SalePrice")]
+
+pafData <- paf(as.matrix(cuantiPaf))
+
+pafData$KMO # 0.7468, lo que dice que la adecuacion a la muestra es decente
+pafData$Bartlett # 21505, es bastante alto, lo cual es bueno
+
+# Verificar significancia
+cortest.bartlett(cuantiPaf[, -1])
+
+# Matriz de correlacion
+cor(cuantiPaf[, -1], use = "pairwise.complete.obs")
+
+# Se normalizan los datos
+cuantinorm <- prcomp(cuantiPaf, scale. = T)
+cuantinorm
+
+summary(cuantinorm)
+
+cuantinormPCA <- PCA(cuantiPaf[, -1], ncp = ncol(cuantiPaf[, -1]), scale.unit = T)
+
+summary(cuantinormPCA)
+
+fviz_eig(cuantinorm, addlabels = TRUE, ylim = c(0, 80))
+fviz_pca_var(cuantinorm, col.var = "cos2",
+             gradient_cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE)
+
+
+#Se obtiene el scree plot de las componentes principales.
+# Como se ve hacen falta 4 de las 7 componentes para explicar m�s del 80% de la variabilidad
+fviz_eig(compPrinc, addlabels = TRUE, ylim = c(0, 80))
+
+# En la siguiente gráfica se ilustra la calidad de la representación de los componentes en las dos primeras dimensiones.
+fviz_pca_var(compPrinc, col.var = "cos2",
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), 
+             repel = TRUE # Avoid text overlapping
+)
+
 
 # Clusters
 # ---------
@@ -355,7 +407,13 @@ prop.table(table(kmg6$SalePrice))*100
 nrow(kmg6)
 summary(kmg6)
 
-plotcluster(cuantiPrueba, km$cluster)
+plotcluster(cuantiPrueba[, c("MSSubClass", "LotArea", "OverallCond", 
+                             "YearBuilt", "YearRemodAdd", "BsmtFinSF1", 
+                             "BsmtUnfSF", "TotalBsmtSF", "X1stFlrSF",
+                             "GrLivArea", "BsmtFullBath", "BsmtHalfBath", "FullBath", "HalfBath", 
+                             "BedroomAbvGr", "KitchenAbvGr", "TotRmsAbvGrd", "Fireplaces", 
+                             "GarageCars", "GarageArea", "WoodDeckSF", "OpenPorchSF", "EnclosedPorch", 
+                             "ScreenPorch", "PoolArea", "MiscVal", "YrSold", "SalePrice")], km$cluster)
 
 #PCA
 pafDatos<-paf(as.matrix(cuantitativas[,2:8]))
